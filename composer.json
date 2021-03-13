@@ -1,0 +1,16 @@
+{
+    "name": "gints/flower-shop",
+    "description": "Flower shop",
+    "authors": [
+        {
+            "name": "Gints",
+            "email": "gints.ozolins@inbox.lv"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Flowers\\": "app/"
+        }
+    }
+}
