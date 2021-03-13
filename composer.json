@@ -1,12 +1,6 @@
 {
     "name": "gints/flower-shop",
     "description": "Flower shop",
-    "authors": [
-        {
-            "name": "Gints",
-            "email": "gints.ozolins@inbox.lv"
-        }
-    ],
     "require": {
         "league/csv": "^9.6",
         "ext-json": "*"
