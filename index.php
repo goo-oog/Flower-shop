@@ -1,3 +1,5 @@
+<html>
+<body>
 <?php
 require_once 'vendor/autoload.php';
 
@@ -46,34 +48,33 @@ foreach ($shop->inventory() as $number => $flower) {
 }
 echo "<br>";
 
-do {
-    $readline = readline('Are you male(m) or female(f)? ');
-} while ($readline !== 'm' && $readline !== 'f');
-$customer = $readline === 'm' ? new Male() : new Female();
-echo "\n";
+echo 'Are you male(m) or female(f)?';
+echo "<br>";
+echo "Female";
 
-do {
-    $itemNumber = filter_var(readline('Which flower do you like? Enter the number: '), FILTER_VALIDATE_INT,
-        ['options' => ['min_range' => 0, 'max_range' => count($shop->inventory())]]);
-} while ($itemNumber === false);
-if ($itemNumber === 0) {
-    exit("\nSee you next time!\n");
-}
 
-do {
-    $itemAmount = filter_var(readline('Enter the amount: '), FILTER_VALIDATE_INT,
-        ['options' => ['min_range' => 0, 'max_range' => $shop->inventory()[$itemNumber - 1]->amount()]]);
-} while ($itemAmount === false);
-if ($itemAmount === 0) {
-    exit("\nSee you next time!\n");
-}
+$customer = new Female();
+echo "<br>";
+
+echo 'Which flower do you like? Enter the number: ';
+echo "<br>";
+
+
+    $itemNumber = 4;
+
+
+    $itemAmount = 9;
+
 
 $shop->addToBasket(new Flower($shop->inventory()[$itemNumber - 1]->name(), $itemAmount));
 
 try {
     echo $shop->printBasket($customer);
-    echo "Thank you for the purchase!\n";
+    echo "Thank you for the purchase!<br>";
 } catch (PriceNotFoundException $exception) {
     $shop->exceptions[] = $exception;
-    echo "\nThat flower does not have price try once more\n";
+    echo "\nThat flower does not have price try once more<br>";
 }
+?>
+</body>
+</html>
