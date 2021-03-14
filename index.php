@@ -43,10 +43,8 @@ $shop->setPriceList([
     'Zenobia' => 8.30,
     'Zephyranthes' => 7.70
 ]);
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if ($_POST['amount'] > $shop->inventory()[$_POST['number'] - 1]->amount()) {
-        $_POST['amount'] = $shop->inventory()[$_POST['number'] - 1]->amount();
-    }
+if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['amount'] > $shop->inventory()[$_POST['number'] - 1]->amount()) {
+    $_POST['amount'] = $shop->inventory()[$_POST['number'] - 1]->amount();
 }
 ?>
 
