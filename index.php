@@ -45,8 +45,7 @@ $shop->setPriceList([
 ]);
 if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['amount'] > $shop->inventory()[$_POST['number'] - 1]->amount()) {
     $_POST['amount'] = $shop->inventory()[$_POST['number'] - 1]->amount();
-}
-?>
+} ?>
 
 <html lang="en">
 <head>
@@ -62,56 +61,56 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['amount'] > $shop->invento
         <td class='header'>Price</td>
     </tr>
     <?php
-    foreach ($shop->inventory() as $number => $flower) {
-        echo "<tr><td class='number'>" . ($number + 1) . "</td><td>{$flower->name()}</td><td class='amount'>{$flower->amount()}</td>";
-        try {
-            printf('<td class="price">%0.2f €</td></tr>', $shop->price($flower->name()));
+    foreach ($shop->inventory() as $number => $flower): ?>
+    <tr>
+        <td class='number'><?= ($number + 1) ?></td>
+        <td><?= $flower->name() ?></td>
+        <td class='amount'><?= $flower->amount() ?></td>
+        <?php try {
+            printf('<td class="price">%0.2f €</td>', $shop->price($flower->name()));
         } catch (PriceNotFoundException $exception) {
-            $shop->exceptions[] = $exception;
-            echo "<td class='no-price'>no price</td></tr>";
-        }
-    }
-    ?>
+            $shop->exceptions[] = $exception; ?>
+            <td class='no-price'>no price</td>
+        <?php }
+        endforeach; ?>
+    </tr>
 </table>
 <br><br>
 
 <form id="form" method="post">
     <label for="number">Enter flower # : </label>
-    <input class="input-box" type="number" id="number" name="number" value="<?= $_POST['number'] ?? '1' ?>" min="1"
-           max="<?= count($shop->inventory()) ?>"><br><br>
+    <input class="input-box" type="number" id="number" name="number" value="<?= $_POST['number'] ?? '1' ?>"
+           min="1" max="<?= count($shop->inventory()) ?>"><br><br>
     <label for="amount">Enter amount : </label>
     <input class="input-box" type="number" id="amount" name="amount" value="<?= $_POST['amount'] ?? '1' ?>"
-           min="1"><br><br>
-    What is your gender?
-    <input type="radio" id="male" name="gender"
-           value="male" <?php if (isset($_POST['gender']) && $_POST['gender'] === 'male') {
-        echo 'checked="checked"';
-    } ?>">
+           min="1"><br>
+    <p>What is your gender?</p>
+    <input type="radio" id="male" name="gender" value="male"
+        <?php if (isset($_POST['gender']) && $_POST['gender'] === 'male'): ?>
+           checked="checked"> <?php endif; ?>
     <label for="male">Male</label>
-    <input type="radio" id="female" name="gender"
-           value="female" <?php if (isset($_POST['gender']) && $_POST['gender'] === 'female') {
-        echo 'checked="checked"';
-    } ?>">
+    <input type="radio" id="female" name="gender" value="female"
+        <?php if (isset($_POST['gender']) && $_POST['gender'] === 'female'): ?>
+           checked="checked"><?php endif; ?>
     <label for="female">Female</label><br><br>
     <input type="submit" value="Submit" class="button">
 </form>
 
 <?php
-if (isset($_POST['gender'], $_POST['number'], $_POST['amount'])) {
+if (isset($_POST['gender'], $_POST['number'], $_POST['amount'])):
     $customer = $_POST['gender'] === 'male' ? new Male() : new Female();
     $itemNumber = $_POST['number'];
     $itemAmount = $_POST['amount'];
     $shop->addToBasket(new Flower($shop->inventory()[$itemNumber - 1]->name(), (int)$itemAmount));
-    try {
-        echo "<span class='basket'>" . $shop->printBasket($customer) . '</span>';
-        echo '<br><br><br>';
-        echo 'Thank you for the purchase!<br>';
-    } catch (PriceNotFoundException $exception) {
-        $shop->exceptions[] = $exception;
-        echo '<br>That flower does not have price try once more<br>';
-    }
-}
-?>
+    try { ?>
+        <span class='basket'><?= $shop->printBasket($customer) ?></span>
+        <br>
+        <p>Thank you for the purchase!</p>
+    <?php } catch (PriceNotFoundException $exception) {
+        $shop->exceptions[] = $exception; ?>
+        <p>That flower does not have price try once more</p>
+    <?php }
+endif; ?>
 
 </body>
 </html>
@@ -162,7 +161,6 @@ if (isset($_POST['gender'], $_POST['number'], $_POST['amount'])) {
     .no-price {
         color: maroon;
         font-size: small;
-
     }
 
     .basket {

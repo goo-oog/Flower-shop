@@ -1,5 +1,14 @@
-{
-  "Zenobia": 69,
-  "Zephyranthes": 27,
-  "Priceless": 1
-}
+[
+  {
+    "name": "Zenobia",
+    "amount": 69
+  },
+  {
+    "name": "Zephyranthes",
+    "amount": 27
+  },
+  {
+    "name": "Priceless",
+    "amount": 1
+  }
+]
