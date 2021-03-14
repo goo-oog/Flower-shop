@@ -5,6 +5,5 @@ namespace Flowershop;
 
 interface Customer
 {
-    public function gender():string;
     public function bill(float $amount): string;
 }

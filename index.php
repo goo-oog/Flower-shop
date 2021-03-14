@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once 'vendor/autoload.php';
 
 use Flowershop\Female;
@@ -41,6 +43,11 @@ $shop->setPriceList([
     'Zenobia' => 8.30,
     'Zephyranthes' => 7.70
 ]);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($_POST['amount'] > $shop->inventory()[$_POST['number'] - 1]->amount()) {
+        $_POST['amount'] = $shop->inventory()[$_POST['number'] - 1]->amount();
+    }
+}
 ?>
 
 <html lang="en">
@@ -49,61 +56,72 @@ $shop->setPriceList([
     <title>Flowershop</title>
 </head>
 <body>
-<table>
+<table id="list">
     <tr>
+    <tr>
+    <tr>
+        <td class='header'>#</td>
         <td class='header'>Flower</td>
         <td class='header'>Amount</td>
         <td class='header'>Price</td>
     </tr>
     <?php
     foreach ($shop->inventory() as $number => $flower) {
-        echo "<tr><td>{$flower->name()}</td><td class='amount'>{$flower->amount()}</td>";
+        echo "<tr><td class='number'>" . ($number + 1) . "</td><td>{$flower->name()}</td><td class='amount'>{$flower->amount()}</td>";
         try {
-            printf("<td>%0.2f €</td></tr>", $shop->price($flower->name()));
+            printf('<td class="price">%0.2f €</td></tr>', $shop->price($flower->name()));
         } catch (PriceNotFoundException $exception) {
             $shop->exceptions[] = $exception;
             echo "<td class='no-price'>no price</td></tr>";
         }
-    } ?>
+    }
+    ?>
 </table>
-<br>
+<br><br>
 
-<p>Are you male or female?</p>
-<form method="post">
-    <input type="radio" id="male" name="gender" value="Male">
+<form id="form" method="post">
+    <label for="number">Enter flower # : </label>
+    <input class="input-box" type="number" id="number" name="number" value="<?= $_POST['number'] ?? '1' ?>" min="1"
+           max="<?= count($shop->inventory()) ?>"><br><br>
+    <label for="amount">Enter amount : </label>
+    <input class="input-box" type="number" id="amount" name="amount" value="<?= $_POST['amount'] ?? '1' ?>"
+           min="1"><br><br>
+    What is your gender?
+    <input type="radio" id="male" name="gender"
+           value="male" <?php if (isset($_POST['gender']) && $_POST['gender'] === 'male') {
+        echo 'checked="checked"';
+    } ?>">
     <label for="male">Male</label>
-    <input type="radio" id="female" name="gender" value="Female">
-    <label for="female">Female</label>
-    <input type="submit" name="submit" value="Set gender">
+    <input type="radio" id="female" name="gender"
+           value="female" <?php if (isset($_POST['gender']) && $_POST['gender'] === 'female') {
+        echo 'checked="checked"';
+    } ?>">
+    <label for="female">Female</label><br><br>
+    <input type="submit" value="Submit" class="button">
 </form>
+
 <?php
-if (isset($_POST['gender'])) {
-    $customer = $_POST['gender'] === 'Male' ? new Male() : new Female();
-    echo $customer->gender() . '<br><br><br>' . '<p>Which flower do you like?</p>';
-    $itemNumber = 4;
-    echo '<p>' . $shop->inventory()[$itemNumber - 1]->name() . '<br><br><br></p>';
-    echo '<p>Choose amount!</p>';
-    $itemAmount = 9;
-    echo "<p>Amount: $itemAmount</p><br>";
-
-    $shop->addToBasket(new Flower($shop->inventory()[$itemNumber - 1]->name(), $itemAmount));
-
+if (isset($_POST['gender'], $_POST['number'], $_POST['amount'])) {
+    $customer = $_POST['gender'] === 'male' ? new Male() : new Female();
+    $itemNumber = $_POST['number'];
+    $itemAmount = $_POST['amount'];
+    $shop->addToBasket(new Flower($shop->inventory()[$itemNumber - 1]->name(), (int)$itemAmount));
     try {
-        echo "<span class='basket'>".$shop->printBasket($customer)."</span>";
-        echo "<br><br><br>";
-        echo "Thank you for the purchase!<br>";
+        echo "<span class='basket'>" . $shop->printBasket($customer) . '</span>';
+        echo '<br><br><br>';
+        echo 'Thank you for the purchase!<br>';
     } catch (PriceNotFoundException $exception) {
         $shop->exceptions[] = $exception;
-        echo "<br>That flower does not have price try once more<br>";
+        echo '<br>That flower does not have price try once more<br>';
     }
 }
 ?>
+
 </body>
 </html>
 
 <style type="text/css">
     body {
-        font-size: large;
         font-family: sans-serif;
         line-height: 50%;
     }
@@ -113,8 +131,6 @@ if (isset($_POST['gender'])) {
         border-width: 5px;
         border-collapse: collapse;
         border-color: black;
-        font-size: large;
-        font-family: sans-serif;
     }
 
     tr:nth-child(odd) {
@@ -122,9 +138,7 @@ if (isset($_POST['gender'])) {
     }
 
     td, header {
-        font-size: x-large;
-        font-family: sans-serif;
-        padding: 10px;
+        padding: 7px;
         border-style: solid;
         border-width: 2px;
         border-color: black;
@@ -138,18 +152,41 @@ if (isset($_POST['gender'])) {
         text-align: center;
     }
 
-    .amount {
+    .amount, .number {
         text-align: right;
         padding-right: 20px;
+        padding-left: 20px;
+    }
+
+    .price, .no-price {
+        text-align: center;
     }
 
     .no-price {
         color: maroon;
-        font-size: medium;
-        text-align: center;
+        font-size: small;
+
     }
+
     .basket {
         white-space: pre;
         font-size: x-large;
+    }
+
+    .button {
+        background-color: white;
+        color: black;
+        border: 2px solid maroon;
+        width: 100px;
+        height: 30px;
+    }
+
+    .button:hover {
+        background-color: maroon;
+        color: white;
+    }
+
+    .input-box {
+        width: 100px;
     }
 </style>
