@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Flowers;
+namespace Flowershop;
 
 use League\Csv\Reader;
 
@@ -28,6 +28,8 @@ class Warehouse4_CSV implements Warehouse
 
     public function addFlowers(array $flowers): void
     {
-
+        foreach ($flowers as $name => $amount) {
+            $this->inventory[] = new Flower($name, $amount);
+        }
     }
 }

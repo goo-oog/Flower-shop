@@ -1,10 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Flowers;
+namespace Flowershop;
 
 class Female implements Customer
 {
+    public function gender(): string
+    {
+        return 'Female';
+    }
 
     public function bill(float $amount): string
     {

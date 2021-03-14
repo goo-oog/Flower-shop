@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Flowers;
+namespace Flowershop;
 
 class Warehouse5_JSON implements Warehouse
 {

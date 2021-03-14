@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Flowers;
+namespace Flowershop;
 
 class Warehouse1_ArrayOfObjects implements Warehouse
 {
