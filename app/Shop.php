@@ -80,9 +80,9 @@ class Shop
     {
         $output = "\n";
         foreach ($this->basket as $flower) {
-            $output .= $flower->name() . '   price: ';
+            $output .= $flower->name() . '     price: ';
             $output .= sprintf('%0.2f €', $this->price($flower->name()));
-            $output .= '  x' . $flower->amount() . '   total: ';
+            $output .= '    x' . $flower->amount() . '     total: ';
             $output .= $customer->bill($this->price($flower->name()) * $flower->amount());
         }
         return $output;

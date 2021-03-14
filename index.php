@@ -79,9 +79,9 @@ $shop->setPriceList([
 <?php
 if (isset($_POST['gender'])) {
     $customer = $_POST['gender'] === 'Male' ? new Male() : new Female();
-    echo $customer->gender() . '<br>' . '<p>Which flower do you like?</p>';
+    echo $customer->gender() . '<br><br><br>' . '<p>Which flower do you like?</p>';
     $itemNumber = 4;
-    echo '<p>' . $shop->inventory()[$itemNumber - 1]->name() . '</p><br>';
+    echo '<p>' . $shop->inventory()[$itemNumber - 1]->name() . '<br><br><br></p>';
     echo '<p>Choose amount!</p>';
     $itemAmount = 9;
     echo "<p>Amount: $itemAmount</p><br>";
@@ -89,8 +89,8 @@ if (isset($_POST['gender'])) {
     $shop->addToBasket(new Flower($shop->inventory()[$itemNumber - 1]->name(), $itemAmount));
 
     try {
-        echo $shop->printBasket($customer);
-        echo "<br><br>";
+        echo "<span class='basket'>".$shop->printBasket($customer)."</span>";
+        echo "<br><br><br>";
         echo "Thank you for the purchase!<br>";
     } catch (PriceNotFoundException $exception) {
         $shop->exceptions[] = $exception;
@@ -105,6 +105,7 @@ if (isset($_POST['gender'])) {
     body {
         font-size: large;
         font-family: sans-serif;
+        line-height: 50%;
     }
 
     table {
@@ -146,5 +147,9 @@ if (isset($_POST['gender'])) {
         color: maroon;
         font-size: medium;
         text-align: center;
+    }
+    .basket {
+        white-space: pre;
+        font-size: x-large;
     }
 </style>
