@@ -58,8 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <table id="list">
     <tr>
-    <tr>
-    <tr>
         <td class='header'>#</td>
         <td class='header'>Flower</td>
         <td class='header'>Amount</td>
