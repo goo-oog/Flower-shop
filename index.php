@@ -150,6 +150,7 @@ if (isset($_POST['gender'], $_POST['number'], $_POST['amount'])) {
         border-right-color: white;
         border-bottom-width: 5px;
         text-align: center;
+        font-weight: bold;
     }
 
     .amount, .number {
