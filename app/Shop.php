@@ -88,7 +88,7 @@ class Shop
      */
     public function printBasket(Customer $customer): string
     {
-        $output = "\n";
+        $output = '';
         foreach ($this->basket as $flower) {
             $output .= $flower->name() . '     price: ';
             $output .= sprintf('%0.2f €', $this->price($flower->name()));

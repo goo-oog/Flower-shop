@@ -50,21 +50,24 @@ $shop->setPriceList([
 $bottomMessage = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $shop->restoreInventory($_SESSION['inventory']);
-    if ($_POST['amount'] > $shop->inventory()[$_POST['number'] - 1]->amount()) {
-        $_POST['amount'] = $shop->inventory()[$_POST['number'] - 1]->amount();
-    }
-    if (isset($_POST['gender'], $_POST['number'], $_POST['amount'])) {
+    if (isset($_POST['gender'], $_POST['number'], $_POST['amount'])
+        && $_POST['gender'] !== '' && $_POST['number'] !== '' && $_POST['amount'] !== '') {
+        if ($_POST['amount'] > $shop->inventory()[$_POST['number'] - 1]->amount()) {
+            $_POST['amount'] = $shop->inventory()[$_POST['number'] - 1]->amount();
+        }
         $customer = $_POST['gender'] === 'male' ? new Male() : new Female();
         $itemNumber = $_POST['number'];
         $itemAmount = $_POST['amount'];
         $shop->addToBasket(new Flower($shop->inventory()[$itemNumber - 1]->name(), (int)$itemAmount));
         try {
-            $bottomMessage = $shop->printBasket($customer) . '<br><p>Thank you for the purchase!</p>';
+            $bottomMessage = $shop->printBasket($customer) . '</p><p>Thank you for the purchase!';
             $shop->sell($itemNumber - 1, (int)$itemAmount);
         } catch (PriceNotFoundException $exception) {
             $shop->exceptions[] = $exception;
             $bottomMessage = 'That flower does not have price, choose a different one!';
         }
+    } else {
+        $bottomMessage = '';
     }
 }
 $_SESSION['inventory'] = $shop->inventory();
@@ -99,16 +102,18 @@ $_SESSION['inventory'] = $shop->inventory();
         endforeach; ?>
     </tr>
 </table>
-<br><br>
+<br>
 
 <form method="post">
     <label for="number">Enter flower # : </label>
-    <input class="input-box" type="number" id="number" name="number" value="<?= $_POST['number'] ?? '1' ?>"
+    <input class="input-box" type="number" id="number" name="number"
+           value="<?= isset($_POST['number']) && $_POST['number'] !== '' ? $_POST['number'] : '1' ?>"
            min="1" max="<?= count($shop->inventory()) ?>"><br><br>
     <label for="amount">Enter amount : </label>
-    <input class="input-box" type="number" id="amount" name="amount" value="<?= $_POST['amount'] ?? '1' ?>"
+    <input class="input-box" type="number" id="amount" name="amount"
+           value="<?= isset($_POST['amount']) && $_POST['amount'] !== '' ? $_POST['amount'] : '1' ?>"
            min="1"><br>
-    <p>What is your gender?</p>
+    <p>What is your gender?
     <input type="radio" id="male" name="gender" value="male"
         <?php if (isset($_POST['gender']) && $_POST['gender'] === 'male'): ?>
            checked="checked"> <?php endif; ?>
@@ -116,10 +121,10 @@ $_SESSION['inventory'] = $shop->inventory();
     <input type="radio" id="female" name="gender" value="female"
         <?php if (isset($_POST['gender']) && $_POST['gender'] === 'female'): ?>
            checked="checked"><?php endif; ?>
-    <label for="female">Female</label><br><br>
+    <label for="female">Female</label></p>
     <input type="submit" value="Submit" class="button">
 </form>
 
-<p class='basket'><?= $bottomMessage ?></p>
+<p class="basket"><?= $bottomMessage ?></p>
 </body>
 </html>

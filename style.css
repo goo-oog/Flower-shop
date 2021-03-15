@@ -1,6 +1,5 @@
 body {
     font-family: sans-serif;
-    line-height: 50%;
 }
 
 table {
@@ -11,7 +10,7 @@ table {
 }
 
 tr:nth-child(odd) {
-    background-color: #eeeeee;
+    background-color: #f8eeee;
 }
 
 td, header {
@@ -48,14 +47,15 @@ td, header {
 .basket {
     white-space: pre;
     font-size: x-large;
+    line-height: 50%;
 }
 
 .button {
     background-color: white;
     color: black;
     border: 2px solid maroon;
-    width: 100px;
-    height: 30px;
+    width: 10em;
+    height: 2em;
 }
 
 .button:hover {
@@ -65,4 +65,5 @@ td, header {
 
 .input-box {
     width: 100px;
+    border: 2px solid maroon;
 }
