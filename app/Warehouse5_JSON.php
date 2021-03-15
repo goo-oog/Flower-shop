@@ -10,9 +10,9 @@ class Warehouse5_JSON implements Warehouse
 
     public function __construct()
     {
-        $json = json_decode(file_get_contents('storage/warehouse5.json'), true);
+        $json = json_decode(file_get_contents('storage/warehouse5.json'));
         foreach ($json as $flower) {
-            $this->inventory[] = new Flower($flower['name'], $flower['amount']);
+            $this->inventory[] = new Flower($flower->name, $flower->amount);
         }
     }
 
