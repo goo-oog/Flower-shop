@@ -14,6 +14,9 @@ use Flowershop\Warehouse3_CommaSeparatedString;
 use Flowershop\Warehouse4_CSV;
 use Flowershop\Warehouse5_JSON;
 
+session_start();
+setcookie(session_name(), session_id(), time() + 300);
+
 $warehouse1 = new Warehouse1_ArrayOfObjects();
 $warehouse2 = new Warehouse2_AssociativeArray();
 $warehouse3 = new Warehouse3_CommaSeparatedString();
@@ -43,17 +46,38 @@ $shop->setPriceList([
     'Zenobia' => 8.30,
     'Zephyranthes' => 7.70
 ]);
-if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['amount'] > $shop->inventory()[$_POST['number'] - 1]->amount()) {
-    $_POST['amount'] = $shop->inventory()[$_POST['number'] - 1]->amount();
-} ?>
+
+$bottomMessage = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $shop->restoreInventory($_SESSION['inventory']);
+    if ($_POST['amount'] > $shop->inventory()[$_POST['number'] - 1]->amount()) {
+        $_POST['amount'] = $shop->inventory()[$_POST['number'] - 1]->amount();
+    }
+    if (isset($_POST['gender'], $_POST['number'], $_POST['amount'])) {
+        $customer = $_POST['gender'] === 'male' ? new Male() : new Female();
+        $itemNumber = $_POST['number'];
+        $itemAmount = $_POST['amount'];
+        $shop->addToBasket(new Flower($shop->inventory()[$itemNumber - 1]->name(), (int)$itemAmount));
+        try {
+            $bottomMessage = $shop->printBasket($customer) . '<br><p>Thank you for the purchase!</p>';
+            $shop->sell($itemNumber - 1, (int)$itemAmount);
+        } catch (PriceNotFoundException $exception) {
+            $shop->exceptions[] = $exception;
+            $bottomMessage = 'That flower does not have price, choose a different one!';
+        }
+    }
+}
+$_SESSION['inventory'] = $shop->inventory();
+?>
 
 <html lang="en">
 <head>
     <meta charset="UTF-8" http-equiv="X-UA-Compatible" content="text/html">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <title>Flowershop</title>
 </head>
 <body>
-<table id="list">
+<table>
     <tr>
         <td class='header'>#</td>
         <td class='header'>Flower</td>
@@ -77,7 +101,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['amount'] > $shop->invento
 </table>
 <br><br>
 
-<form id="form" method="post">
+<form method="post">
     <label for="number">Enter flower # : </label>
     <input class="input-box" type="number" id="number" name="number" value="<?= $_POST['number'] ?? '1' ?>"
            min="1" max="<?= count($shop->inventory()) ?>"><br><br>
@@ -96,92 +120,6 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST') && $_POST['amount'] > $shop->invento
     <input type="submit" value="Submit" class="button">
 </form>
 
-<?php
-if (isset($_POST['gender'], $_POST['number'], $_POST['amount'])):
-    $customer = $_POST['gender'] === 'male' ? new Male() : new Female();
-    $itemNumber = $_POST['number'];
-    $itemAmount = $_POST['amount'];
-    $shop->addToBasket(new Flower($shop->inventory()[$itemNumber - 1]->name(), (int)$itemAmount));
-    try { ?>
-        <span class='basket'><?= $shop->printBasket($customer) ?></span>
-        <br>
-        <p>Thank you for the purchase!</p>
-    <?php } catch (PriceNotFoundException $exception) {
-        $shop->exceptions[] = $exception; ?>
-        <p>That flower does not have price try once more</p>
-    <?php }
-endif; ?>
-
+<p class='basket'><?= $bottomMessage ?></p>
 </body>
 </html>
-
-<style type="text/css">
-    body {
-        font-family: sans-serif;
-        line-height: 50%;
-    }
-
-    table {
-        border-style: solid;
-        border-width: 5px;
-        border-collapse: collapse;
-        border-color: black;
-    }
-
-    tr:nth-child(odd) {
-        background-color: #eeeeee;
-    }
-
-    td, header {
-        padding: 7px;
-        border-style: solid;
-        border-width: 2px;
-        border-color: black;
-    }
-
-    .header {
-        background-color: maroon;
-        color: white;
-        border-right-color: white;
-        border-bottom-width: 5px;
-        text-align: center;
-        font-weight: bold;
-    }
-
-    .amount, .number {
-        text-align: right;
-        padding-right: 20px;
-        padding-left: 20px;
-    }
-
-    .price, .no-price {
-        text-align: center;
-    }
-
-    .no-price {
-        color: maroon;
-        font-size: small;
-    }
-
-    .basket {
-        white-space: pre;
-        font-size: x-large;
-    }
-
-    .button {
-        background-color: white;
-        color: black;
-        border: 2px solid maroon;
-        width: 100px;
-        height: 30px;
-    }
-
-    .button:hover {
-        background-color: maroon;
-        color: white;
-    }
-
-    .input-box {
-        width: 100px;
-    }
-</style>

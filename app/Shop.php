@@ -48,6 +48,16 @@ class Shop
         return $this->inventory;
     }
 
+    public function restoreInventory(array $inventory): void
+    {
+        $this->inventory = $inventory;
+    }
+
+    public function sell(int $flowerIndex, int $amount): void
+    {
+        $this->inventory[$flowerIndex]->subtractFromAmount($amount);
+    }
+
     public function setPriceList(array $priceList): void
     {
         $this->priceList = $priceList;
