@@ -10,17 +10,30 @@ class Shop
     private array $priceList = [];
     /**@var Flower[] */
     private array $basket = [];
-    public array $exceptions = [];
+
+    public function __construct()
+    {
+        $warehouse4 = new Warehouse4_CSV();
+        $warehouse5 = new Warehouse5_JSON();
+        $warehouse6 = new Warehouse6_SQL();
+        $this->addWarehouse($warehouse4);
+        $this->addWarehouse($warehouse5);
+        $this->addWarehouse($warehouse6);
+        $this->setPriceList([
+            'Tulip' => 0.75,
+            'Rose' => 2.70,
+            'Lily' => 3.50,
+            'Hyacinth' => 1.20,
+            'Orchid' => 2.00,
+            'Daffodil' => 0.50
+        ]);
+    }
 
     public function addWarehouse(Warehouse $warehouse): void
     {
         foreach ($warehouse->inventory() as $flower) {
             if (in_array($flower->name(), array_column($this->inventory, 'name'), true)) {
-                try {
-                    $this->findFlower($flower->name())->addToAmount($flower->amount());
-                } catch (FlowerNotFoundException $exception) {
-                    $this->exceptions[] = $exception;
-                }
+                $this->searchInventory($flower->name())->addToAmount($flower->amount());
             } else {
                 $this->inventory[] = $flower;
             }
@@ -28,19 +41,24 @@ class Shop
         sort($this->inventory);
     }
 
-    /**
-     * @param $name
-     * @return Flower
-     * @throws FlowerNotFoundException
-     */
-    private function findFlower(string $name): Flower
+    private function searchInventory(string $name): ?Flower
     {
         foreach ($this->inventory as $i => $flower) {
             if ($flower->name() === $name) {
                 return $this->inventory[$i];
             }
         }
-        throw new FlowerNotFoundException('Flower not found');
+        return null;
+    }
+
+    private function searchBasket(string $name): ?Flower
+    {
+        foreach ($this->basket as $i => $flower) {
+            if ($flower->name() === $name) {
+                return $this->basket[$i];
+            }
+        }
+        return null;
     }
 
     public function inventory(): array
@@ -48,43 +66,54 @@ class Shop
         return $this->inventory;
     }
 
+    public function restoreInventory(array $inventory): void
+    {
+        $this->inventory = $inventory;
+    }
+
+    public function sell(int $flowerIndex, int $amount): void
+    {
+        $this->inventory[$flowerIndex]->subtractFromAmount($amount);
+    }
+
     public function setPriceList(array $priceList): void
     {
         $this->priceList = $priceList;
     }
 
-    /**
-     * @param $name
-     * @return float
-     * @throws PriceNotFoundException
-     */
     public function price(string $name): float
     {
         if (array_key_exists($name, $this->priceList)) {
             return $this->priceList[$name];
         }
-        throw new PriceNotFoundException('Flower do not have price');
+        return 0;
+    }
+
+    public function basket(): array
+    {
+        return $this->basket;
+    }
+
+    public function grandTotal(): float
+    {
+        $total = 0;
+        foreach ($this->basket as $flower) {
+            $total += $this->price($flower->name()) * $flower->amount();
+        }
+        return $total;
     }
 
     public function addToBasket(Flower $flower): void
     {
-        $this->basket[] = $flower;
+        if (in_array($flower->name(), array_column($this->basket, 'name'), true)) {
+            $this->searchBasket($flower->name())->addToAmount($flower->amount());
+        } else {
+            $this->basket[] = $flower;
+        }
     }
 
-    /**
-     * @param Customer $customer
-     * @return string
-     * @throws PriceNotFoundException
-     */
-    public function printBasket(Customer $customer): string
+    public function restoreBasket(array $basket): void
     {
-        $output = "\n";
-        foreach ($this->basket as $flower) {
-            $output .= $flower->name() . '     price: ';
-            $output .= sprintf('%0.2f €', $this->price($flower->name()));
-            $output .= '    x' . $flower->amount() . '     total: ';
-            $output .= $customer->bill($this->price($flower->name()) * $flower->amount());
-        }
-        return $output;
+        $this->basket = $basket;
     }
 }

@@ -5,8 +5,16 @@ namespace Flowershop;
 
 class Female implements Customer
 {
-    public function bill(float $amount): string
+    private const DISCOUNT = 0.2;
+    private const DISCOUNT_MESSAGE = ' (-20% feminine discount applied)';
+
+    public function discount(): float
     {
-        return sprintf("%0.2f €     (-20%% feminine discount applied)\n\n", $amount * 0.8);
+        return self::DISCOUNT;
+    }
+
+    public function discountMessage(): string
+    {
+        return self::DISCOUNT_MESSAGE;
     }
 }

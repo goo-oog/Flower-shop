@@ -1,13 +1,16 @@
 {
-    "name": "gints/flower-shop",
-    "description": "Flower shop",
-    "require": {
-        "league/csv": "^9.6",
-        "ext-json": "*"
-    },
-    "autoload": {
-        "psr-4": {
-            "Flowershop\\": "app/"
-        }
+  "name": "gints/flower-shop",
+  "description": "Flower shop",
+  "require": {
+    "nikic/fast-route": "^1.3",
+    "league/csv": "^9.6",
+    "ext-json": "*",
+    "ext-pdo": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Flowershop\\": "app/",
+      "Flowershop\\Controllers\\": "Controllers"
     }
+  }
 }
